@@ -1,0 +1,34 @@
+upstream app_server {
+         server 127.0.0.1:8000 fail_timeout=0;
+}
+
+server {
+        #listen   80; ## listen for ipv4; this line is default and implied
+        #listen   [::]:80 default ipv6only=on; ## listen for ipv6
+        client_max_body_size 128M;
+
+        root /usr/share/nginx/www;
+        index index.html index.htm;
+
+        # Make site accessible from http://localhost/
+        server_name localhost;
+
+        location / {
+             client_max_body_size 128M;
+             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header Host $http_host;
+            proxy_redirect off;
+
+             proxy_pass   http://app_server;
+        }
+        # Set expires max on static file types
+        location ~* ^.+\.(css|js|jpg|jpeg|gif|png|ico|gz|svg|svgz|ttf|otf|woff|eot|mp4|ogg|ogv|webm)$ {
+            expires max;
+            root   /home/ubuntu/espnw/app/;
+            access_log off;
+        }
+
+        location /static/ {
+            alias /home/ubuntu/espnw/app/static/;
+        }
+}
