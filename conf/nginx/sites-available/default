@@ -29,6 +29,7 @@ server {
         }
 
         location /static/ {
+        #NOTE: the trailing slash here is critical!
             alias /home/ubuntu/espnw/app/static/;
         }
 }
